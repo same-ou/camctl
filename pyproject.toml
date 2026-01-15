@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "camctl"
+version = "0.1.0"
+description = "Control camunda using the command line."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27.0",
+    "PyYAML>=6.0",
+    "taskipy>=1.14.1",
+    "typer>=0.20.0",
+]
+
+[project.scripts]
+camctl = "camctl.console.app:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/camctl"]
+
+[tool.taskipy.tasks]
+help = "task --list"
+sync = "uv sync"
+install = "task sync"
+run = "python -m camctl"
+pre_test = "python -c \"import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('pytest') else 1)\" || { echo \"pytest not installed. Install with: uv add --dev pytest\"; exit 1; }"
+test = "pytest -q"
+pre_lint = "python -c \"import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('ruff') else 1)\" || { echo \"ruff not installed. Install with: uv add --dev ruff\"; exit 1; }"
+lint = "ruff check ."
+pre_format = "python -c \"import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('ruff') else 1)\" || { echo \"ruff not installed. Install with: uv add --dev ruff\"; exit 1; }"
+format = "ruff format ."
+pre_typecheck = "python -c \"import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('mypy') else 1)\" || { echo \"mypy not installed. Install with: uv add --dev mypy\"; exit 1; }"
+typecheck = "mypy src"
+check = "task lint && task test"
+clean = """
+find . -type d -name '__pycache__' -prune -exec rm -rf {} +
+find . -type d -name '.pytest_cache' -prune -exec rm -rf {} +
+find . -type d -name '.ruff_cache' -prune -exec rm -rf {} +
+find . -type d -name '.mypy_cache' -prune -exec rm -rf {} +
+find . -type d -name 'build' -prune -exec rm -rf {} +
+find . -type d -name 'dist' -prune -exec rm -rf {} +
+find . -type f -name '*.pyc' -delete
+"""

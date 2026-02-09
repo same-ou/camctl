@@ -6,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from camctl.api.camunda.tasks import TaskListParams
+from camctl.api.camunda.resources.tasks import TaskListParams
 from camctl.console.commands.tasks import tasks_app
 from camctl.console.commands.tasks import filters as task_filters
 from camctl.console.context import require_context
@@ -166,6 +166,11 @@ def list_tasks(
         "--raw",
         help="Print raw JSON instead of a table.",
     ),
+    ids_only: bool = typer.Option(
+        False,
+        "--ids-only",
+        help="Print only task IDs (one per line) for shell piping/chaining.",
+    ),
 ) -> None:
     """List tasks with filters and pagination."""
     filter_kwargs = task_filters.build_task_filter_kwargs(locals())
@@ -184,6 +189,12 @@ def list_tasks(
 
     if output:
         write_json(page_result, output)
+
+    if ids_only:
+        for task in page_result.items:
+            if task.id:
+                typer.echo(task.id)
+        return
 
     if raw:
         print_raw_json(page_result)

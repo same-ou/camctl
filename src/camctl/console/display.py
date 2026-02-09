@@ -13,9 +13,9 @@ from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.table import Table
 
-from camctl.api.http import Page, Resource
-from camctl.api.camunda.processes.models import ProcessInstance
-from camctl.api.camunda.tasks.models import Task
+from camctl.api.camunda.common import Page, Resource
+from camctl.api.camunda.resources.processes.models import ProcessInstance
+from camctl.api.camunda.resources.tasks.models import Task
 from camctl.utils import dumps_json
 
 _console = Console()

@@ -7,7 +7,7 @@ from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any
 
-from camctl.api.http import Resource
+from camctl.api.camunda.common import Resource
 
 
 def dumps_json(payload: Any) -> str:

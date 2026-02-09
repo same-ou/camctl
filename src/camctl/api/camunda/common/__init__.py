@@ -1,5 +1,6 @@
-"""Shared Camunda models used across services."""
+"""Common Camunda models shared across services."""
 
+from .models import Page, PaginationInfo, Resource, SortInfo
 from .variables import (
     Variable,
     VariableModificationRequest,
@@ -8,6 +9,10 @@ from .variables import (
 )
 
 __all__ = [
+    "Page",
+    "PaginationInfo",
+    "Resource",
+    "SortInfo",
     "Variable",
     "VariableModificationRequest",
     "VariablePayload",

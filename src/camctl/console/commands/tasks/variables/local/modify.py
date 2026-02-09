@@ -6,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from camctl.api.camunda.tasks import TaskVariableModificationRequest
+from camctl.api.camunda.resources.tasks import TaskVariableModificationRequest
 from camctl.console.commands.tasks.variables.common import load_modifications
 from camctl.console.commands.tasks.variables.local import local_app
 from camctl.console.context import require_context

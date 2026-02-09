@@ -7,7 +7,7 @@ from typing import Any, Mapping, get_args
 
 import typer
 
-from camctl.api.camunda.tasks import TaskFilterParams
+from camctl.api.camunda.resources.tasks import TaskFilterParams
 
 
 def _is_optional_bool(annotation: Any) -> bool:

@@ -12,6 +12,7 @@ dependencies = [
     "httpx>=0.27.0",
     "PyYAML>=6.0",
     "taskipy>=1.14.1",
+    "textual>=3.0.0",
     "typer>=0.20.0",
 ]
 
@@ -44,3 +45,8 @@ find . -type d -name 'build' -prune -exec rm -rf {} +
 find . -type d -name 'dist' -prune -exec rm -rf {} +
 find . -type f -name '*.pyc' -delete
 """
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.0",
+]

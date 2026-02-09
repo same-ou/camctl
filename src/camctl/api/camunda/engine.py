@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Self
 
 from camctl.api.camunda.client import CamundaClient
-from camctl.api.camunda.processes import ProcessesAPI
-from camctl.api.camunda.tasks import TasksAPI
+from camctl.api.camunda.resources.processes import ProcessesAPI
+from camctl.api.camunda.resources.tasks import TasksAPI
 
 
 class CamundaEngine:

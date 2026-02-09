@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from camctl.api.http import Page
+from camctl.api.camunda.common import Page
 from camctl.api.camunda.service import CamSubService
 
 from .endpoints import TaskEndpoint
@@ -41,7 +41,7 @@ class TasksAPI(CamSubService):
         """List tasks with optional query parameters."""
         response = self._client.get(
             self._path(TaskEndpoint.LIST.value),
-            params=params.to_params() if params else None,
+            params=params,
         )
         payload = response.json()
         if isinstance(payload, list):
@@ -55,7 +55,7 @@ class TasksAPI(CamSubService):
         """Count tasks with optional query parameters."""
         response = self._client.get(
             self._path(TaskEndpoint.COUNT.value),
-            params=params.to_params() if params else None,
+            params=params,
         )
         payload = response.json()
         if isinstance(payload, dict) and "count" in payload:
@@ -137,7 +137,7 @@ class TasksAPI(CamSubService):
             self._path(
                 TaskEndpoint.LOCAL_TASK_VARIABLES.value.format(task_id=task_id)
             ),
-            json=payload.to_payload(),
+            json=payload,
         )
 
     def modify_variables(
@@ -149,7 +149,7 @@ class TasksAPI(CamSubService):
         """Update and/or delete task variables in a single request."""
         self._client.post(
             self._path(TaskEndpoint.TASK_VARIABLES.value.format(task_id=task_id)),
-            json=payload.to_payload(),
+            json=payload,
         )
 
     def get_variable(
@@ -210,7 +210,7 @@ class TasksAPI(CamSubService):
             self._path(
                 TaskEndpoint.TASK_VARIABLE.value.format(task_id=task_id, var_name=var_name)
             ),
-            json=payload.to_payload(),
+            json=payload,
         )
 
     def update_local_variable(
@@ -227,7 +227,7 @@ class TasksAPI(CamSubService):
                     task_id=task_id, var_name=var_name
                 )
             ),
-            json=payload.to_payload(),
+            json=payload,
         )
 
     def delete_variable(
@@ -265,7 +265,7 @@ class TasksAPI(CamSubService):
         """Complete a task using the supplied payload."""
         response = self._client.post(
             self._path(TaskEndpoint.COMPLETE.value.format(task_id=task_id)),
-            json=payload.to_payload(),
+            json=payload,
             allow_error=True,
         )
         if response.status_code == 404:

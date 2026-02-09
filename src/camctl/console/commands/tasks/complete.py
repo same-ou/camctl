@@ -6,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from camctl.api.camunda.tasks import TaskCompletionRequest
+from camctl.api.camunda.resources.tasks import TaskCompletionRequest
 from camctl.console.commands.tasks import tasks_app
 from camctl.console.context import require_context
 from camctl.console.display import print_json, print_summary

@@ -7,7 +7,7 @@ from typing import Any, Mapping, get_args
 
 import typer
 
-from camctl.api.camunda.processes import ProcessFilterParams
+from camctl.api.camunda.resources.processes import ProcessFilterParams
 
 
 def _is_optional_bool(annotation: Any) -> bool:

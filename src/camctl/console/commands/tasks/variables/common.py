@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from camctl.api.camunda.tasks import TaskVariablePayload
+from camctl.api.camunda.resources.tasks import TaskVariablePayload
 from camctl.console.inputs import merge_mappings, parse_json_mapping
 
 

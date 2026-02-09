@@ -6,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from camctl.api.camunda.processes import ProcessListParams
+from camctl.api.camunda.resources.processes import ProcessListParams
 from camctl.console.commands.processes import processes_app
 from camctl.console.commands.processes import filters as process_filters
 from camctl.console.context import require_context
@@ -101,6 +101,11 @@ def list_processes(
         "--raw",
         help="Print raw JSON instead of a table.",
     ),
+    ids_only: bool = typer.Option(
+        False,
+        "--ids-only",
+        help="Print only process IDs (one per line) for shell piping/chaining.",
+    ),
 ) -> None:
     """List process instances with filters and pagination."""
     filter_kwargs = process_filters.build_process_filter_kwargs(locals())
@@ -119,6 +124,12 @@ def list_processes(
 
     if output:
         write_json(page_result, output)
+
+    if ids_only:
+        for proc in page_result.items:
+            if proc.id:
+                typer.echo(proc.id)
+        return
 
     if raw:
         print_raw_json(page_result)

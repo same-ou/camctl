@@ -75,3 +75,4 @@ def main(
 
 app.add_typer(tasks_app, name="tasks")
 app.add_typer(processes_app, name="processes")
+

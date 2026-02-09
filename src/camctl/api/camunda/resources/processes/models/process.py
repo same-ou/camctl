@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from camctl.api.http import Resource
+from camctl.api.camunda.common import Resource
 
 
 @dataclass(kw_only=True)

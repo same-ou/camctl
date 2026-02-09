@@ -10,8 +10,10 @@ from urllib.parse import urljoin
 
 import httpx
 
-logger = logging.getLogger(__name__)
+from camctl.api.http.circuit_breaker import CircuitBreaker
+from camctl.api.http.serialize import Serializer, SnakeToCamelSerializer
 
+logger = logging.getLogger(__name__)
 
 class HTTPClient(ABC):
     """
@@ -22,9 +24,16 @@ class HTTPClient(ABC):
     callers remain consistent about HTTP verb usage.
     """
 
-    def __init__(self, base_url: str, *, timeout: float = 10.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        *,
+        timeout: float = 10.0,
+        serializer: Serializer,
+    ) -> None:
         self.base_url = base_url.rstrip("/") + "/"
         self.timeout = timeout
+        self._serializer: Serializer = serializer
 
     @abstractmethod
     def request(
@@ -32,8 +41,8 @@ class HTTPClient(ABC):
         method: HTTPMethod,
         path: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
-        data: Optional[Mapping[str, Any]] = None,
+        params: Optional[Any] = None,
+        data: Optional[Any] = None,
         json: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
@@ -47,7 +56,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
+        params: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
         cookies: Optional[Mapping[str, str]] = None,
@@ -68,7 +77,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        data: Optional[Mapping[str, Any]] = None,
+        data: Optional[Any] = None,
         json: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
@@ -93,7 +102,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        data: Optional[Mapping[str, Any]] = None,
+        data: Optional[Any] = None,
         json: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
@@ -118,7 +127,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        data: Optional[Mapping[str, Any]] = None,
+        data: Optional[Any] = None,
         json: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
@@ -143,7 +152,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
+        params: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
         cookies: Optional[Mapping[str, str]] = None,
@@ -164,7 +173,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
+        params: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
         cookies: Optional[Mapping[str, str]] = None,
@@ -185,7 +194,7 @@ class HTTPClient(ABC):
         self,
         path: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
+        params: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
         cookies: Optional[Mapping[str, str]] = None,
@@ -229,8 +238,12 @@ class BaseHTTPClient(HTTPClient):
         default_headers: Optional[Mapping[str, str]] = None,
         basic_auth: Optional[tuple[str, str]] = None,
         client: Optional[httpx.Client] = None,
+        serializer: Serializer | None = None,
+        circuit_breaker: CircuitBreaker | None = None,
     ) -> None:
-        super().__init__(base_url, timeout=timeout)
+        resolved_serializer = serializer or SnakeToCamelSerializer()
+        super().__init__(base_url, timeout=timeout, serializer=resolved_serializer)
+        self._circuit_breaker = circuit_breaker
         self._owns_client = client is None
         if client is None:
             auth = httpx.BasicAuth(*basic_auth) if basic_auth else None
@@ -266,8 +279,8 @@ class BaseHTTPClient(HTTPClient):
         method: HTTPMethod,
         path: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
-        data: Optional[Mapping[str, Any]] = None,
+        params: Optional[Any] = None,
+        data: Optional[Any] = None,
         json: Optional[Any] = None,
         headers: Optional[Mapping[str, str]] = None,
         timeout: Optional[float] = None,
@@ -295,17 +308,30 @@ class BaseHTTPClient(HTTPClient):
         """
         url = self._build_url(path)
         request_headers = self._build_request_headers(headers)
+        if self._circuit_breaker is not None:
+            self._circuit_breaker.before_request()
         logger.debug("HTTP %s %s", method.value, url)
-        response = self._client.request(
-            method.value,
-            url,
-            params=params,
-            data=data,
-            json=json,
-            headers=request_headers,
-            timeout=timeout if timeout is not None else self.timeout,
-            files=files,
-        )
+        try:
+            response = self._client.request(
+                method.value,
+                url,
+                params=self._serializer.serialize(params),
+                data=self._serializer.serialize(data),
+                json=self._serializer.serialize(json),
+                headers=request_headers,
+                timeout=timeout if timeout is not None else self.timeout,
+                files=files,
+            )
+        except httpx.HTTPError:
+            if self._circuit_breaker is not None:
+                self._circuit_breaker.record_failure()
+            raise
+
+        if self._circuit_breaker is not None:
+            if response.status_code >= 500:
+                self._circuit_breaker.record_failure()
+            else:
+                self._circuit_breaker.record_success()
         if not allow_error:
             self._raise_for_status(response)
         return response

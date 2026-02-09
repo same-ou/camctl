@@ -1,15 +1,16 @@
-"""HTTP client primitives used by Camunda service clients."""
 
 from .base import BaseHTTPClient, HTTPClient
-from .models import Page, PaginationInfo, Resource, SortInfo
+from .circuit_breaker import CircuitBreaker, CircuitBreakerOpenError
 from .params import Params
+from .serialize import SerializeMixin, Serializer, SnakeToCamelSerializer
 
 __all__ = [
     "BaseHTTPClient",
     "HTTPClient",
+    "CircuitBreaker",
+    "CircuitBreakerOpenError",
+    "SerializeMixin",
+    "Serializer",
+    "SnakeToCamelSerializer",
     "Params",
-    "Page",
-    "PaginationInfo",
-    "Resource",
-    "SortInfo",
 ]

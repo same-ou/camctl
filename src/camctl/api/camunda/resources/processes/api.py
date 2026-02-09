@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from camctl.api.http import Page
-from camctl.api.camunda.models import Variable
+from camctl.api.camunda.common import Page
+from camctl.api.camunda.common import Variable
 from camctl.api.camunda.service import CamSubService
 
 from .endpoints import ProcessEndpoint
@@ -35,7 +35,7 @@ class ProcessesAPI(CamSubService):
         """List process instances with optional query parameters."""
         response = self._client.get(
             self._path(ProcessEndpoint.LIST.value),
-            params=params.to_params() if params else None,
+            params=params,
         )
         payload = response.json()
         if isinstance(payload, list):
@@ -53,7 +53,7 @@ class ProcessesAPI(CamSubService):
         """Count process instances with optional query parameters."""
         response = self._client.get(
             self._path(ProcessEndpoint.COUNT.value),
-            params=params.to_params() if params else None,
+            params=params,
         )
         payload = response.json()
         if isinstance(payload, dict) and "count" in payload:

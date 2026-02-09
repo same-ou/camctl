@@ -1,9 +1,8 @@
-"""Shared HTTP resource and pagination models."""
+"""Shared Camunda resource and pagination models."""
 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field, fields, is_dataclass
-import re
 from typing import (
     Any,
     Callable,
@@ -18,17 +17,9 @@ from typing import (
     get_type_hints,
 )
 
+from camctl.api.http.serialize import _camel_to_snake
+
 T = TypeVar("T", bound="Resource")
-
-_CAMEL_RE_1 = re.compile(r"(.)([A-Z][a-z]+)")
-_CAMEL_RE_2 = re.compile(r"([a-z0-9])([A-Z])")
-
-
-def _camel_to_snake(value: str) -> str:
-    value = value.rstrip(":")
-    value = value.replace("-", "_")
-    step1 = _CAMEL_RE_1.sub(r"\1_\2", value)
-    return _CAMEL_RE_2.sub(r"\1_\2", step1).lower()
 
 
 def _normalize_keys(data: Mapping[str, Any]) -> dict[str, Any]:
@@ -55,7 +46,7 @@ def _resource_type(annotation: Any) -> type["Resource"] | None:
 
 @dataclass(kw_only=True)
 class Resource:
-    """Base class for API response mappings."""
+    """Base class for Camunda API response mappings."""
 
     raw: Mapping[str, Any] = field(default_factory=dict, repr=False)
 
@@ -164,3 +155,11 @@ class Page(Resource, Generic[T]):
         if self.sort:
             base["sort"] = asdict(self.sort)
         return base
+
+
+__all__ = [
+    "Page",
+    "PaginationInfo",
+    "Resource",
+    "SortInfo",
+]

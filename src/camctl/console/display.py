@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict
 from enum import Enum
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
@@ -13,10 +13,10 @@ from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.table import Table
 
-from camctl.api.camunda.common import Page, Resource
+from camctl.api.camunda.common import Page
 from camctl.api.camunda.resources.processes.models import ProcessInstance
 from camctl.api.camunda.resources.tasks.models import Task
-from camctl.utils import dumps_json
+from camctl.utils import dumps_json, normalize
 
 _console = Console()
 
@@ -112,7 +112,7 @@ def print_json(payload: Any, *, title: str | None = None) -> None:
     if payload is None:
         _console.print("[yellow]No data returned.[/yellow]")
         return
-    normalized = _normalize(payload)
+    normalized = normalize(payload)
     pretty = Pretty(normalized, expand_all=True)
     if title:
         _console.print(Panel(pretty, title=title))
@@ -204,20 +204,6 @@ def _print_page_meta(page: Page[Any]) -> None:
     if meta:
         _console.print(Panel(Pretty(meta), title="Page Info"))
 
-
-def _normalize(payload: Any) -> Any:
-    """Normalize payloads into JSON-serializable structures."""
-    if isinstance(payload, Resource):
-        return _normalize(payload.to_dict())
-    if is_dataclass(payload):
-        return _normalize(asdict(payload))
-    if isinstance(payload, dict):
-        return {key: _normalize(value) for key, value in payload.items()}
-    if isinstance(payload, list):
-        return [_normalize(item) for item in payload]
-    if isinstance(payload, tuple):
-        return [_normalize(item) for item in payload]
-    return payload
 
 
 def _string(value: Any) -> str:

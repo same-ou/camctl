@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from camctl.api.http import Params
+from camctl.api.http import SerializeMixin
 
 
 @dataclass(kw_only=True)
-class TaskFilterParams(Params):
+class TaskFilterParams(SerializeMixin):
     """Filters for task queries."""
 
     task_id: str | None = None

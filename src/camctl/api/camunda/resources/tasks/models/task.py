@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from camctl.api.camunda.common import Variable, VariableValueInfo
-
-from camctl.api.camunda.common import Resource
+from camctl.api.camunda.common import CamundaResource, Resource, Variable, VariableValueInfo
 
 
 @dataclass(kw_only=True)
@@ -23,10 +21,9 @@ TaskVariable = Variable
 
 
 @dataclass(kw_only=True)
-class Task(Resource):
+class Task(CamundaResource):
     """Represents a task resource returned by the Camunda API."""
 
-    id: str | None = None
     name: str | None = None
     assignee: str | None = None
     created: str | None = None
@@ -42,13 +39,10 @@ class Task(Resource):
     process_definition_id: str | None = None
     process_instance_id: str | None = None
     case_definition_id: str | None = None
-    case_instance_id: str | None = None
     case_execution_id: str | None = None
     task_definition_key: str | None = None
-    suspended: bool | None = None
     form_key: str | None = None
     camunda_form_ref: CamundaFormRef | None = None
-    tenant_id: str | None = None
     task_state: str | None = None
     status: str | None = None
 

@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 import httpx
 
 from camctl.api.http.circuit_breaker import CircuitBreaker
-from camctl.api.http.serialize import Serializer, SnakeToCamelSerializer
+from camctl.api.http.serialize import IdentitySerializer, Serializer
 
 logger = logging.getLogger(__name__)
 
@@ -241,7 +241,7 @@ class BaseHTTPClient(HTTPClient):
         serializer: Serializer | None = None,
         circuit_breaker: CircuitBreaker | None = None,
     ) -> None:
-        resolved_serializer = serializer or SnakeToCamelSerializer()
+        resolved_serializer = serializer or IdentitySerializer()
         super().__init__(base_url, timeout=timeout, serializer=resolved_serializer)
         self._circuit_breaker = circuit_breaker
         self._owns_client = client is None

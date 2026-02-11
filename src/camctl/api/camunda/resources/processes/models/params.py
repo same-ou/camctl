@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from camctl.api.http import Params
+from camctl.api.http import SerializeMixin
 
 
 @dataclass(kw_only=True)
-class ProcessFilterParams(Params):
+class ProcessFilterParams(SerializeMixin):
     """Filters for process instance queries."""
 
     process_instance_ids: str | None = None

@@ -5,22 +5,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from camctl.api.camunda.common import Resource
+from camctl.api.camunda.common import CamundaResource, Resource
 
 
 @dataclass(kw_only=True)
-class ProcessInstance(Resource):
+class ProcessInstance(CamundaResource):
     """Represents a process instance resource returned by the Camunda API."""
 
     links: list[Mapping[str, Any]] | None = None
-    id: str | None = None
     definition_id: str | None = None
     definition_key: str | None = None
     business_key: str | None = None
-    case_instance_id: str | None = None
     ended: bool | None = None
-    suspended: bool | None = None
-    tenant_id: str | None = None
 
 
 @dataclass(kw_only=True)

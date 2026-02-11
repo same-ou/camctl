@@ -20,7 +20,7 @@ _CAMEL_RE_1 = re.compile(r"(.)([A-Z][a-z]+)")
 _CAMEL_RE_2 = re.compile(r"([a-z0-9])([A-Z])")
 
 
-def _camel_to_snake(value: str) -> str:
+def camel_to_snake(value: str) -> str:
     value = value.rstrip(":")
     value = value.replace("-", "_")
     step1 = _CAMEL_RE_1.sub(r"\1_\2", value)
@@ -97,6 +97,13 @@ class Serializer(ABC):
         raise NotImplementedError
 
 
+class IdentitySerializer(Serializer):
+    """Pass-through serializer that returns values unchanged."""
+
+    def serialize(self, value: Any) -> Any:
+        return value
+
+
 class SnakeToCamelSerializer(Serializer):
     """Serialize request data with snake_case keys converted to camelCase."""
 
@@ -108,7 +115,9 @@ class SnakeToCamelSerializer(Serializer):
 
 
 __all__ = [
+    "IdentitySerializer",
     "SerializeMixin",
     "Serializer",
     "SnakeToCamelSerializer",
+    "camel_to_snake",
 ]

@@ -1,16 +1,15 @@
 
 from .base import BaseHTTPClient, HTTPClient
 from .circuit_breaker import CircuitBreaker, CircuitBreakerOpenError
-from .params import Params
-from .serialize import SerializeMixin, Serializer, SnakeToCamelSerializer
+from .serialize import IdentitySerializer, SerializeMixin, Serializer, SnakeToCamelSerializer
 
 __all__ = [
     "BaseHTTPClient",
-    "HTTPClient",
     "CircuitBreaker",
     "CircuitBreakerOpenError",
+    "HTTPClient",
+    "IdentitySerializer",
     "SerializeMixin",
     "Serializer",
     "SnakeToCamelSerializer",
-    "Params",
 ]

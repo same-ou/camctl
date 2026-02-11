@@ -51,26 +51,11 @@ def main(
         count=True,
         help="Increase logging verbosity (-v for info, -vv for debug).",
     ),
-    authority: str = typer.Option(
-        "uat",
-        envvar="CAMCTL_AUTHORITY",
-        help="Target authority (uat or prod).",
-    ),
-    scope: list[str] | None = typer.Option(
-        None,
-        "--scope",
-        "-s",
-        help="Optional OAuth scopes (repeat flag for multiple).",
-    ),
 ) -> None:
     """Configure shared CLI state used by all commands."""
     configure_logging(verbose)
     if ctx.invoked_subcommand is None:
         Console().print(f"[bold cyan]{_BANNER}[/bold cyan]")
-    ctx.obj = CLIContext(
-        authority=authority,
-        scopes=scope,
-    )
 
 
 app.add_typer(tasks_app, name="tasks")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any, Self
 
 from camctl.api.http import SerializeMixin
 
@@ -10,6 +11,35 @@ from camctl.api.http import SerializeMixin
 @dataclass(kw_only=True)
 class ProcessFilterParams(SerializeMixin):
     """Filters for process instance queries."""
+
+    # -- Factory helpers for common query patterns --
+
+    @classmethod
+    def for_definition_key(cls, key: str, **kwargs: Any) -> Self:
+        """Instances of a specific process definition."""
+        return cls(process_definition_key=key, **kwargs)
+
+    @classmethod
+    def for_business_key(cls, key: str, **kwargs: Any) -> Self:
+        """Instances matching a business key."""
+        return cls(business_key=key, **kwargs)
+
+    @classmethod
+    def for_active(cls, **kwargs: Any) -> Self:
+        """Only active (non-suspended) instances."""
+        return cls(active=True, **kwargs)
+
+    @classmethod
+    def for_suspended(cls, **kwargs: Any) -> Self:
+        """Only suspended instances."""
+        return cls(suspended=True, **kwargs)
+
+    @classmethod
+    def with_incidents(cls, **kwargs: Any) -> Self:
+        """Only instances that have incidents."""
+        return cls(with_incident=True, **kwargs)
+
+    # -- Fields --
 
     process_instance_ids: str | None = None
     business_key: str | None = None

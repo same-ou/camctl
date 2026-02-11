@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any, Self
 
 from camctl.api.http import SerializeMixin
 
@@ -10,6 +11,50 @@ from camctl.api.http import SerializeMixin
 @dataclass(kw_only=True)
 class TaskFilterParams(SerializeMixin):
     """Filters for task queries."""
+
+    # -- Factory helpers for common query patterns --
+
+    @classmethod
+    def for_candidate_group(cls, group: str, **kwargs: Any) -> Self:
+        """Tasks available to a candidate group."""
+        return cls(candidate_group=group, **kwargs)
+
+    @classmethod
+    def for_candidate_user(cls, user: str, **kwargs: Any) -> Self:
+        """Tasks available to a candidate user."""
+        return cls(candidate_user=user, **kwargs)
+
+    @classmethod
+    def for_assignee(cls, assignee: str, **kwargs: Any) -> Self:
+        """Tasks assigned to a specific user."""
+        return cls(assignee=assignee, **kwargs)
+
+    @classmethod
+    def for_unassigned(cls, **kwargs: Any) -> Self:
+        """Tasks that have no assignee."""
+        return cls(unassigned=True, **kwargs)
+
+    @classmethod
+    def for_process_instance(cls, process_instance_id: str, **kwargs: Any) -> Self:
+        """Tasks belonging to a specific process instance."""
+        return cls(process_instance_id=process_instance_id, **kwargs)
+
+    @classmethod
+    def for_process_definition(cls, key: str, **kwargs: Any) -> Self:
+        """Tasks belonging to a specific process definition."""
+        return cls(process_definition_key=key, **kwargs)
+
+    @classmethod
+    def for_active(cls, **kwargs: Any) -> Self:
+        """Only active (non-suspended) tasks."""
+        return cls(active=True, **kwargs)
+
+    @classmethod
+    def for_suspended(cls, **kwargs: Any) -> Self:
+        """Only suspended tasks."""
+        return cls(suspended=True, **kwargs)
+
+    # -- Fields --
 
     task_id: str | None = None
     task_id_in: str | None = None
